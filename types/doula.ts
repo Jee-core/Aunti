@@ -1,0 +1,31 @@
+export interface Doula {
+  id: string;
+  name: string;
+  imageUrl: string;
+  type: 'Birth' | 'Postpartum' | 'Full Spectrum';
+  zipCode: string;
+  city: string;
+  state: string;
+  rating: number;
+  reviewCount: number;
+  priceRange: string;
+  bio: string;
+  availableDates: string[]; // Array of YYYY-MM-DD dates when they are available
+  pronouns?: string;
+  testimonialsCount?: number;
+  tags?: string[];
+  packagesStartAt?: number;
+  addOnServicesStartAt?: number;
+  hasSlidingScale?: boolean;
+  hasPaymentPlans?: boolean;
+  hasRosetteBadge?: boolean;
+  badgeText?: string;
+  availableDays?: string[];
+  careOffered?: string[];
+  certifications?: string[];
+  inclusiveCare?: string[];
+  specialCircumstances?: string[];
+  supportTypes?: string[];
+  languages?: string[];
+}
+

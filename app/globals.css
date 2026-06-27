@@ -1,0 +1,123 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-serif: var(--font-serif), ui-serif, Georgia, serif;
+
+  --color-brand-orange: #E05A36;
+  --color-brand-orange-hover: #C54726;
+  --color-brand-bg: #FAF6F0;
+  --color-brand-dark: #0E1521;
+  --color-brand-menu: #131926;
+
+  --color-blob-green: #76A63F;
+  --color-blob-pink: #E794D3;
+  --color-blob-teal: #036952;
+  --color-blob-blue: #1B52B3;
+  --color-blob-yellow: #F49E00;
+  --color-blob-orange: #E05A36;
+  --color-blob-lightblue: #6B9FE6;
+}
+
+:root {
+  background-color: var(--color-brand-bg);
+  color: #1F2937;
+}
+
+html,
+body {
+  overflow-x: hidden;
+  max-width: 100%;
+}
+
+/* ─── Prevent every element from overflowing horizontally ─── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  min-width: 0; /* critical: prevents flex/grid children from overflowing */
+}
+
+/* Custom Smooth Transitions */
+.transition-all-custom {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Simple keyframe for subtle float animations */
+@keyframes float {
+  0% {
+    transform: translateY(0px) rotate(0deg);
+  }
+
+  50% {
+    transform: translateY(-8px) rotate(2deg);
+  }
+
+  100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+}
+
+.animate-float {
+  animation: float 8s ease-in-out infinite;
+}
+
+/* Skeleton loader shimmer animation */
+@keyframes shimmer {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  100% {
+    transform: translateX(100%);
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 1.6s infinite;
+}
+
+/* Hide Next.js dev indicator badge */
+nextjs-portal {
+  display: none !important;
+}
+
+/* ─── Doula Tags — responsive chip layout ─── */
+/* Tags always flex-wrap, use available space before wrapping */
+.doula-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  /* allow chips to shrink so they never overflow the card */
+  overflow: hidden;
+}
+
+.doula-tag {
+  /* tags can shrink but should not break their text */
+  flex-shrink: 1;
+  white-space: nowrap;
+}
+
+/* ─── Very small screens (≤360px) — tighten tag spacing ─── */
+@media (max-width: 360px) {
+  .doula-tags {
+    gap: 4px !important;
+  }
+
+  .doula-tag {
+    font-size: 10px !important;
+    padding: 3px 8px !important;
+  }
+}
+
+/* ─── Mobile screens (361px–639px) ─── */
+@media (min-width: 361px) and (max-width: 639px) {
+  .doula-tags {
+    gap: 5px !important;
+  }
+
+  .doula-tag {
+    font-size: 11px !important;
+    padding: 4px 10px !important;
+  }
+}
