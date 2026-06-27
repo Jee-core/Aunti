@@ -208,7 +208,7 @@ export const mockDoulas: Doula[] = [
   {
     id: '8',
     name: 'Mei-Ling Chen',
-    imageUrl: 'https://images.unsplash.com/photo-1554784790-3349b763876e?w=300&h=300&fit=crop&crop=face',
+    imageUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=300&h=300&fit=crop&crop=face',
     type: 'Birth',
     zipCode: '98102',
     city: 'Seattle',

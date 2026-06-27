@@ -673,7 +673,7 @@ export default function SearchResults({
 
                   {/* Right Column: Pricing & Policy Box */}
                   <div className="flex-shrink-0 w-full sm:w-[170px] md:w-[185px] lg:w-[185px] xl:w-[210px] mt-2 sm:mt-0">
-                    <div className="border border-zinc-200 rounded-2xl sm:rounded-[20px] bg-white p-3 sm:p-4 md:p-4.5 w-full flex flex-col">
+                    <div className="border border-zinc-200 lg:border-0 rounded-2xl sm:rounded-[20px] lg:rounded-none bg-white lg:bg-transparent p-3 sm:p-4 md:p-4.5 lg:p-0 w-full flex flex-col">
                       {/* Packages fee */}
                       <div className="pb-2.5 sm:pb-3 border-b border-zinc-200/80">
                         <span className="block font-sans text-[9px] xs:text-[10px] sm:text-xs font-bold text-[#00664B] mb-0.5">
@@ -689,7 +689,7 @@ export default function SearchResults({
                         <span className="block font-sans text-[9px] xs:text-[10px] sm:text-xs font-bold text-[#00664B] mb-0.5">
                           Add-on services start at
                         </span>
-                        <span className="font-sans text-xs xs:text-sm sm:text-base lg:text-sm xl:text-base font-bold text-zinc-900 leading-none">
+                        <span className="font-sans text-xs xs:text-sm sm:text-base lg:text-[20px] xl:text-[22px] font-bold text-zinc-900 leading-none">
                           ${doula.addOnServicesStartAt ?? 35}/hr
                         </span>
                       </div>
