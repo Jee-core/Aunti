@@ -10,13 +10,9 @@ interface DatePickerProps {
 
 export default function DatePicker({ selectedDate, onChange }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [currentDate, setCurrentDate] = useState(() => {
-    // Default to June 2026 as in metadata or current date
-    return new Date(2026, 5, 26);
-  });
+  const [currentDate, setCurrentDate] = useState(() => new Date(2026, 5, 26));
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  // Close dropdown on click outside
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
@@ -29,7 +25,6 @@ export default function DatePicker({ selectedDate, onChange }: DatePickerProps) 
 
   const handleDaySelect = (day: number) => {
     const selected = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
-    // Adjust to local time format YYYY-MM-DD
     const y = selected.getFullYear();
     const m = String(selected.getMonth() + 1).padStart(2, '0');
     const d = String(selected.getDate()).padStart(2, '0');
@@ -50,10 +45,9 @@ export default function DatePicker({ selectedDate, onChange }: DatePickerProps) 
     'July', 'August', 'September', 'October', 'November', 'December'
   ];
 
-  const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 (Sun) to 6 (Sat)
+  const firstDayOfMonth = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  // Create grid arrays
   const blanks = Array(firstDayOfMonth).fill(null);
   const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
   const gridCells = [...blanks, ...days];
@@ -88,7 +82,6 @@ export default function DatePicker({ selectedDate, onChange }: DatePickerProps) 
 
       {isOpen && (
         <div className="absolute left-0 right-0 z-50 mt-2 rounded-lg border border-zinc-200 bg-white p-4 shadow-xl">
-          {/* Header */}
           <div className="mb-4 flex items-center justify-between">
             <button
               type="button"
@@ -109,7 +102,6 @@ export default function DatePicker({ selectedDate, onChange }: DatePickerProps) 
             </button>
           </div>
 
-          {/* Weekday labels */}
           <div className="grid grid-cols-7 gap-1 mb-2 text-center text-xs font-semibold text-zinc-400">
             <div>S</div>
             <div>M</div>
@@ -120,7 +112,6 @@ export default function DatePicker({ selectedDate, onChange }: DatePickerProps) 
             <div>S</div>
           </div>
 
-          {/* Calendar grid */}
           <div className="grid grid-cols-7 gap-1 justify-items-center">
             {gridCells.map((cell, idx) => {
               if (cell === null) {

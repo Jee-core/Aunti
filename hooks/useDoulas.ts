@@ -53,7 +53,7 @@ export function useDoulas() {
         params.append('minPostpartumRate', String(mprVal));
         params.append('maxPostpartumRate', String(xprVal));
 
-        // Group extra filters by category (e.g. care, cert, inc, spec, sup, lang)
+        // Group filter keys like 'care-Overnight support' into { care: ['Overnight support'] }
         const groups: Record<string, string[]> = {};
         Object.entries(currentExtraFilters).forEach(([key, active]) => {
           if (!active) return;
@@ -79,7 +79,7 @@ export function useDoulas() {
             const body = await response.json();
             if (body?.message) message = body.message;
           } catch {
-            // ignore
+            // intentionally swallowed — fall back to generic message
           }
           throw new Error(message);
         }
@@ -135,17 +135,23 @@ export function useDoulas() {
     }));
   }, []);
 
-  // Initial load
   useEffect(() => {
-    fetchDoulas('', [], null, [], {}, 0, 3000, 0, 150);
-    return () => abortRef.current?.abort();
+    const timeoutId = setTimeout(() => {
+      fetchDoulas('', [], null, [], {}, 0, 3000, 0, 150);
+    }, 0);
+    return () => {
+      clearTimeout(timeoutId);
+      abortRef.current?.abort();
+    };
   }, [fetchDoulas]);
 
-  // Auto-fetch in search results mode when filters change
   useEffect(() => {
     if (isSearchActive) {
       if (zip.trim().length === 0 || zip.trim().length === 5) {
-        fetchDoulas(zip, types, date, days, extraFilters, minBirthFee, maxBirthFee, minPostpartumRate, maxPostpartumRate);
+        const timeoutId = setTimeout(() => {
+          fetchDoulas(zip, types, date, days, extraFilters, minBirthFee, maxBirthFee, minPostpartumRate, maxPostpartumRate);
+        }, 0);
+        return () => clearTimeout(timeoutId);
       }
     }
   }, [isSearchActive, zip, types, date, days, extraFilters, minBirthFee, maxBirthFee, minPostpartumRate, maxPostpartumRate, fetchDoulas]);
@@ -154,15 +160,12 @@ export function useDoulas() {
     zip,
     setZip,
     types,
-    setTypes,
     toggleType,
     date,
     setDate,
     days,
-    setDays,
     toggleDay,
     extraFilters,
-    setExtraFilters,
     toggleExtraFilter,
     minBirthFee,
     setMinBirthFee,
@@ -176,7 +179,6 @@ export function useDoulas() {
     loading,
     error,
     isSearchActive,
-    setIsSearchActive,
     fetchDoulas: search,
     resetFilters,
   };

@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Aunti | Doula Directory Platform
+
+Aunti is a modern, responsive doula directory web application built using Next.js, TypeScript, and Tailwind CSS. It allows families to find the perfect doula for birth, postpartum, and full spectrum care, filtering by zip code, availability dates, preferred working days, care services, inclusive attributes, sliding scale options, and pricing ranges.
+
+---
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
 
+Ensure you have [Node.js](https://nodejs.org/) installed (v18.x or later recommended).
+
+### Installation
+
+1. Clone the repository and navigate to the project directory.
+2. Install all dependencies:
+   ```bash
+   npm install
+   ```
+
+### Running the Development Server
+
+Start the local Next.js development server:
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open [http://localhost:3000](http://localhost:3000) in your browser to view the application.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+### Building for Production
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Compile the optimized static and dynamic production bundle:
+```bash
+npm run build
+```
 
-## Learn More
+Verify type safety and lint rules pass:
+```bash
+npm run lint
+```
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Folder Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+The project maintains a strict, clean separation of concerns:
 
-## Deploy on Vercel
+```
+├── app/
+│   ├── api/
+│   │   └── doulas/
+│   │       └── route.ts       # Next.js API Route Handler (implements backend filtering/latency simulation)
+│   ├── globals.css            # Global CSS styles and Tailwind configurations
+│   ├── layout.tsx             # Root layout (imports fonts and configures meta-tags)
+│   └── page.tsx               # Main client-side container connecting search views & hooks
+├── components/
+│   ├── DatePicker.tsx         # Custom, responsive popover calendar component
+│   ├── Footer.tsx             # Optimized 2-column mobile and premium desktop footer
+│   ├── Hero.tsx               # Primary search input card and vector blob layout
+│   ├── HowItWorks.tsx         # Interactive accordion detailing how to find a doula
+│   ├── Navbar.tsx             # Responsive global navigation bar with mobile toggle menu
+│   └── SearchResults.tsx      # Main search layout containing filter sidebar and results grid
+├── hooks/
+│   └── useDoulas.ts           # Custom React hook encapsulating filtering, resetting, and API state
+├── lib/
+│   └── mockDoulas.ts          # Mock dataset of doulas with rich metadata
+├── public/                    # Static assets (images, icons, favicon)
+├── types/
+│   └── doula.ts               # Core TypeScript interface definition for the Doula entity
+└── tsconfig.json              # TypeScript compilation configurations
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+---
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Architecture & Design Tradeoffs
+
+### State Management: Custom Hook (`useDoulas`) vs. URL Query Strings
+
+During implementation, we chose to encapsulate all search, filter, and fetching logic inside a custom React hook ([useDoulas.ts](file:///c:/Users/SpectreOS/Desktop/Internship/Aunti/hooks/useDoulas.ts)) rather than relying on Next.js URL query strings (via `useSearchParams`).
+
+#### Rationale & Benefits
+* **State Cohesion**: Storing filter values (including complex objects, arrays, and numbers) inside local React state simplifies reset actions, updates, and conditional rendering.
+* **Network Efficiency**: The custom hook leverages an `AbortController` via a `useRef` to cancel ongoing network requests when the user changes filters rapidly. This prevents race conditions and redundant fetch completions.
+* **Component isolation**: By keeping the state out of the Next.js router, we prevent routing side-effects (like layout re-mounts or scroll-to-top behaviors) during filter modifications, leading to a much smoother user experience.
+
+#### Tradeoffs
+* **Deep Linking**: The direct consequence of this decision is that users cannot bookmark or share a specific filtered view URL directly. For a directory platform of this scale, prioritizing a fast, fluid, and robust local search experience over shareable URLs was determined to be the optimal trade-off for the initial phase.

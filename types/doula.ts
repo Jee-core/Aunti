@@ -10,7 +10,7 @@ export interface Doula {
   reviewCount: number;
   priceRange: string;
   bio: string;
-  availableDates: string[]; // Array of YYYY-MM-DD dates when they are available
+  availableDates: string[];
   pronouns?: string;
   testimonialsCount?: number;
   tags?: string[];
@@ -28,4 +28,3 @@ export interface Doula {
   supportTypes?: string[];
   languages?: string[];
 }
-

@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Star, MapPin, Calendar, AlertTriangle, RefreshCw, Sparkles, ChevronDown, ChevronUp, Check, X, Award } from 'lucide-react';
+import { useState } from 'react';
+import Image from 'next/image';
+import { MapPin, AlertTriangle, RefreshCw, Sparkles, ChevronDown, ChevronUp, Award } from 'lucide-react';
 import { Doula } from '../types/doula';
 import DatePicker from './DatePicker';
 
@@ -228,7 +229,7 @@ export default function SearchResults({
             {/* Expected Due Date */}
             <div className="flex flex-col gap-1.5 sm:gap-2">
               <label className="font-sans text-[10px] sm:text-xs font-bold text-zinc-700 tracking-wide">
-                Expected due date (or baby's birth date)
+                Expected due date (or baby&apos;s birth date)
               </label>
               <DatePicker selectedDate={date} onChange={setDate} />
             </div>
@@ -530,7 +531,7 @@ export default function SearchResults({
             <div className="relative flex-shrink-0">
               <select
                 value={sortBy}
-                onChange={(e) => setSortBy(e.target.value as any)}
+                onChange={(e) => setSortBy(e.target.value as 'best' | 'rating' | 'price_asc' | 'price_desc')}
                 className="appearance-none rounded-lg border border-zinc-300 bg-white py-1.5 pl-3 pr-9 text-xs font-bold text-zinc-700 shadow-sm focus:outline-none focus:ring-2 focus:ring-brand-orange focus:border-brand-orange cursor-pointer"
               >
                 <option value="best">Best match</option>
@@ -589,9 +590,11 @@ export default function SearchResults({
                   className="flex flex-col sm:flex-row items-start justify-between gap-4 sm:gap-5 md:gap-5 lg:gap-4 xl:gap-6 2xl:gap-8 overflow-hidden rounded-2xl sm:rounded-[24px] border border-zinc-200/80 bg-white p-3.5 sm:p-5 md:p-5 lg:p-5 xl:p-[28px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
                 >
                   {/* Photo */}
-                  <img
+                  <Image
                     src={doula.imageUrl}
                     alt={doula.name}
+                    width={155}
+                    height={155}
                     className="w-[80px] h-[80px] xs:w-[90px] xs:h-[90px] sm:w-[110px] sm:h-[110px] md:w-[130px] md:h-[130px] lg:w-[130px] lg:h-[130px] xl:w-[155px] xl:h-[155px] rounded-xl sm:rounded-[16px] md:rounded-[20px] object-cover flex-shrink-0 bg-zinc-50 border border-zinc-100 self-start"
                   />
 

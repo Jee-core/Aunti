@@ -15,8 +15,6 @@ export default function Home() {
     toggleType,
     date,
     setDate,
-    days,
-    toggleDay,
     extraFilters,
     toggleExtraFilter,
     minBirthFee,
@@ -37,13 +35,11 @@ export default function Home() {
 
   return (
     <div className="flex flex-col min-h-screen bg-[#FAF6F0]">
-      {/* Top Navigation */}
       <Navbar />
 
       <main className="flex-grow">
         {!isSearchActive ? (
           <>
-            {/* Hero Form section with organic background blobs */}
             <Hero
               zip={zip}
               setZip={setZip}
@@ -54,11 +50,9 @@ export default function Home() {
               onSearch={fetchDoulas}
               onReset={resetFilters}
             />
-            {/* How It Works Accordion Section */}
             <HowItWorks />
           </>
         ) : (
-          /* Active Search Results Section (lists doulas with filters sidebar on left) */
           <SearchResults
             doulas={doulas}
             loading={loading}
@@ -85,7 +79,6 @@ export default function Home() {
         )}
       </main>
 
-      {/* Footer Section */}
       <Footer isSearchActive={isSearchActive} />
     </div>
   );
