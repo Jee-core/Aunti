@@ -53,7 +53,6 @@ export function useDoulas() {
         params.append('minPostpartumRate', String(mprVal));
         params.append('maxPostpartumRate', String(xprVal));
 
-        // Group filter keys like 'care-Overnight support' into { care: ['Overnight support'] }
         const groups: Record<string, string[]> = {};
         Object.entries(currentExtraFilters).forEach(([key, active]) => {
           if (!active) return;
@@ -122,12 +121,6 @@ export function useDoulas() {
     );
   }, []);
 
-  const toggleDay = useCallback((day: string) => {
-    setDays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day]
-    );
-  }, []);
-
   const toggleExtraFilter = useCallback((filterKey: string) => {
     setExtraFilters((prev) => ({
       ...prev,
@@ -163,8 +156,6 @@ export function useDoulas() {
     toggleType,
     date,
     setDate,
-    days,
-    toggleDay,
     extraFilters,
     toggleExtraFilter,
     minBirthFee,

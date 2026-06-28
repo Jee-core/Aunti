@@ -6,18 +6,24 @@ import { MapPin, AlertTriangle, RefreshCw, Sparkles, ChevronDown, ChevronUp, Awa
 import { Doula } from '../types/doula';
 import DatePicker from './DatePicker';
 
+type DoulaType = 'Birth' | 'Postpartum' | 'Full Spectrum';
+
+const TYPE_LABELS: Record<string, DoulaType> = {
+  'Birth Doula': 'Birth',
+  'Postpartum Doula': 'Postpartum',
+  'Full Spectrum Doula': 'Full Spectrum',
+};
+
 interface SearchResultsProps {
   doulas: Doula[];
   loading: boolean;
   error: string | null;
   onRetry: () => void;
   onReset: () => void;
-  
-  // Shared state with useDoulas
   zip: string;
   setZip: (val: string) => void;
-  types: ('Birth' | 'Postpartum' | 'Full Spectrum')[];
-  toggleType: (type: 'Birth' | 'Postpartum' | 'Full Spectrum') => void;
+  types: DoulaType[];
+  toggleType: (type: DoulaType) => void;
   date: string | null;
   setDate: (date: string | null) => void;
   extraFilters: Record<string, boolean>;
@@ -55,10 +61,8 @@ export default function SearchResults({
   maxPostpartumRate,
   setMaxPostpartumRate,
 }: SearchResultsProps) {
-  // Sidebar ZIP code error validation state
   const [sidebarZipError, setSidebarZipError] = useState<string | null>(null);
 
-  // Accordion sections state for sidebar "Filters"
   const [openSections, setOpenSections] = useState<Record<string, boolean>>({
     care: false,
     cert: false,
@@ -74,41 +78,30 @@ export default function SearchResults({
     setOpenSections((prev) => ({ ...prev, [section]: !prev[section] }));
   };
 
-  // ZIP Code input change handler
   const handleZipChange = (val: string) => {
     const clean = val.replace(/\D/g, '');
     setZip(clean);
-    
-    if (clean.length === 5) {
+    if (clean.length === 5 || clean.length === 0) {
       setSidebarZipError(null);
-    } else if (clean.length > 0) {
-      setSidebarZipError('Zip code must be 5 digits.');
     } else {
-      setSidebarZipError(null);
+      setSidebarZipError('Zip code must be 5 digits.');
     }
   };
 
-  // Birth Support Dual Slider handlers
   const handleMinBirthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Math.min(Number(e.target.value), maxBirthFee - 100);
-    setMinBirthFee(value);
+    setMinBirthFee(Math.min(Number(e.target.value), maxBirthFee - 100));
   };
   const handleMaxBirthChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Math.max(Number(e.target.value), minBirthFee + 100);
-    setMaxBirthFee(value);
+    setMaxBirthFee(Math.max(Number(e.target.value), minBirthFee + 100));
   };
 
-  // Postpartum Support Dual Slider handlers
   const handleMinPostpartumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Math.min(Number(e.target.value), maxPostpartumRate - 5);
-    setMinPostpartumRate(value);
+    setMinPostpartumRate(Math.min(Number(e.target.value), maxPostpartumRate - 5));
   };
   const handleMaxPostpartumChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = Math.max(Number(e.target.value), minPostpartumRate + 5);
-    setMaxPostpartumRate(value);
+    setMaxPostpartumRate(Math.max(Number(e.target.value), minPostpartumRate + 5));
   };
 
-  // 1. Loading State (Skeletons)
   if (loading) {
     return (
       <section className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6 sm:py-12 md:px-12 lg:px-24">
@@ -121,11 +114,9 @@ export default function SearchResults({
               key={n}
               className="relative flex flex-col md:flex-row justify-between gap-6 overflow-hidden rounded-2xl border border-zinc-200 bg-white p-6 shadow-sm"
             >
-              {/* Shimmer Effect */}
               <div className="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/50 to-transparent animate-shimmer" />
-
               <div className="flex gap-4 flex-1">
-                <div className="h-28 w-28 rounded-2xl bg-zinc-200 animate-pulse flex-shrink-0" />
+                <div className="h-28 w-28 rounded-xl bg-zinc-200 animate-pulse flex-shrink-0" />
                 <div className="space-y-2 flex-1">
                   <div className="h-4 w-1/3 rounded bg-zinc-200 animate-pulse" />
                   <div className="h-3 w-1/4 rounded bg-zinc-200 animate-pulse" />
@@ -142,8 +133,6 @@ export default function SearchResults({
       </section>
     );
   }
-
-  // 2. Error State
   if (error) {
     return (
       <section className="mx-auto w-full max-w-3xl px-6 py-16 text-center">
@@ -207,8 +196,8 @@ export default function SearchResults({
                 Specialty
               </label>
               <div className="flex flex-col gap-2 sm:gap-3">
-                {(['Birth Doula', 'Postpartum Doula', 'Full Spectrum Doula'] as const).map((typeLabel) => {
-                  const typeValue = typeLabel.split(' ')[0] as 'Birth' | 'Postpartum' | 'Full Spectrum';
+                {(Object.keys(TYPE_LABELS) as Array<keyof typeof TYPE_LABELS>).map((typeLabel) => {
+                  const typeValue = TYPE_LABELS[typeLabel];
                   return (
                     <label key={typeLabel} className="flex items-center gap-2 sm:gap-2.5 cursor-pointer group">
                       <input
@@ -235,14 +224,12 @@ export default function SearchResults({
             </div>
 
 
-
             {/* Birth Support Slider */}
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-baseline font-sans text-[10px] sm:text-xs font-bold text-zinc-700 tracking-wide">
                 <span>Birth Support (total fee)</span>
-                <span className="text-zinc-600 font-semibold font-mono">${minBirthFee}-${maxBirthFee}</span>
+                <span className="text-zinc-600 font-semibold font-mono">${minBirthFee}–${maxBirthFee}</span>
               </div>
-              {/* Dual Range Slider container */}
               <div className="relative w-full h-6 flex items-center">
                 <div className="absolute left-0 right-0 h-1 bg-zinc-100 rounded-full" />
                 <div
@@ -279,9 +266,8 @@ export default function SearchResults({
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-baseline font-sans text-[10px] sm:text-xs font-bold text-zinc-700 tracking-wide">
                 <span>Postpartum Support (hourly rate)</span>
-                <span className="text-zinc-600 font-semibold font-mono">${minPostpartumRate}-${maxPostpartumRate}</span>
+                <span className="text-zinc-600 font-semibold font-mono">${minPostpartumRate}–${maxPostpartumRate}</span>
               </div>
-              {/* Dual Range Slider container */}
               <div className="relative w-full h-6 flex items-center">
                 <div className="absolute left-0 right-0 h-1 bg-zinc-100 rounded-full" />
                 <div
@@ -314,7 +300,6 @@ export default function SearchResults({
               </div>
             </div>
 
-            {/* Collapsible Accordions Under Filters Header */}
             <div className="border-t border-zinc-100 pt-4 sm:pt-5">
               <div className="flex justify-between items-center mb-3 sm:mb-4">
                 <span className="font-sans text-xs sm:text-sm font-extrabold text-zinc-900">Filters</span>
@@ -326,10 +311,7 @@ export default function SearchResults({
                   Reset filters
                 </button>
               </div>
-
-              {/* Accordion Categories */}
               <div className="flex flex-col divide-y divide-zinc-100">
-                {/* 1. Type of care offered */}
                 <div className="py-2 sm:py-3">
                   <button
                     type="button"
@@ -360,7 +342,6 @@ export default function SearchResults({
                   </div>
                 </div>
 
-                {/* 2. Certification */}
                 <div className="py-2 sm:py-3">
                   <button
                     type="button"
@@ -391,7 +372,6 @@ export default function SearchResults({
                   </div>
                 </div>
 
-                {/* 3. Inclusive care */}
                 <div className="py-2 sm:py-3">
                   <button
                     type="button"
@@ -422,7 +402,6 @@ export default function SearchResults({
                   </div>
                 </div>
 
-                {/* 4. Special circumstances */}
                 <div className="py-2 sm:py-3">
                   <button
                     type="button"
@@ -453,7 +432,6 @@ export default function SearchResults({
                   </div>
                 </div>
 
-                {/* 5. Support type */}
                 <div className="py-2 sm:py-3">
                   <button
                     type="button"
@@ -484,7 +462,6 @@ export default function SearchResults({
                   </div>
                 </div>
 
-                {/* 6. Languages spoken */}
                 <div className="py-2 sm:py-3">
                   <button
                     type="button"
@@ -519,15 +496,11 @@ export default function SearchResults({
           </div>
         </aside>
 
-        {/* RIGHT DYNAMIC LIST OF RESULTS */}
         <div className="flex-grow min-w-0 w-full">
-          {/* Header Row */}
           <div className="mb-4 sm:mb-5 flex flex-wrap items-center justify-between gap-2">
             <h3 className="font-sans text-sm sm:text-base font-extrabold text-zinc-900">
               {doulas.length} matching doulas
             </h3>
-            
-            {/* Sort Dropdown */}
             <div className="relative flex-shrink-0">
               <select
                 value={sortBy}
@@ -543,7 +516,7 @@ export default function SearchResults({
             </div>
           </div>
 
-          {/* Cards Stack */}
+
           {doulas.length === 0 ? (
             <div className="rounded-2xl border border-zinc-200 bg-white p-8 sm:p-12 text-center shadow-sm">
               <Sparkles className="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-zinc-300 mb-4" />
@@ -587,23 +560,21 @@ export default function SearchResults({
               }).map((doula) => (
                 <div
                   key={doula.id}
-                  className="flex flex-col sm:flex-row items-start justify-between gap-4 sm:gap-5 md:gap-5 lg:gap-4 xl:gap-6 2xl:gap-8 overflow-hidden rounded-2xl sm:rounded-[24px] border border-zinc-200/80 bg-white p-3.5 sm:p-5 md:p-5 lg:p-5 xl:p-[28px] shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
+                  className="flex flex-col sm:flex-row items-start justify-between gap-3 sm:gap-4 md:gap-5 lg:gap-4 xl:gap-6 overflow-hidden rounded-2xl border border-zinc-200/80 bg-white p-3 sm:p-4 md:p-4 lg:p-5 xl:p-6 shadow-[0_4px_20px_rgba(0,0,0,0.02)] transition-all duration-300 hover:shadow-[0_8px_30px_rgba(0,0,0,0.04)]"
                 >
-                  {/* Photo */}
                   <Image
                     src={doula.imageUrl}
                     alt={doula.name}
-                    width={155}
-                    height={155}
-                    className="w-[80px] h-[80px] xs:w-[90px] xs:h-[90px] sm:w-[110px] sm:h-[110px] md:w-[130px] md:h-[130px] lg:w-[130px] lg:h-[130px] xl:w-[155px] xl:h-[155px] rounded-xl sm:rounded-[16px] md:rounded-[20px] object-cover flex-shrink-0 bg-zinc-50 border border-zinc-100 self-start"
+                    width={200}
+                    height={200}
+                    className="w-[76px] h-[76px] sm:w-[100px] sm:h-[100px] md:w-[120px] md:h-[120px] lg:w-[190px] lg:h-[190px] xl:w-[200px] xl:h-[200px] object-cover flex-shrink-0 bg-zinc-50 border border-zinc-100 self-start"
+                    onError={(e) => { (e.currentTarget as HTMLImageElement).src = '/riley_johnston.png'; }}
                   />
 
-                  {/* Middle: Name + Meta + Tags + CTA */}
-                  <div className="flex flex-col justify-between flex-grow min-w-0 sm:pl-1 md:pl-2">
+                  <div className="flex flex-col justify-between flex-grow min-w-0 sm:pl-1 md:pl-2 lg:pl-4 xl:pl-5 lg:min-h-[190px]">
                     <div>
-                      {/* Name and Rosette badge */}
                       <div className="flex items-center gap-1.5 flex-wrap">
-                        <h4 className="font-serif text-base xs:text-lg sm:text-xl md:text-[24px] lg:text-[24px] xl:text-[28px] font-normal text-zinc-900 leading-snug">
+                        <h4 className="font-serif text-base sm:text-xl md:text-[22px] lg:text-[24px] xl:text-[26px] font-normal text-zinc-900 leading-snug">
                           {doula.name}
                         </h4>
                         {doula.hasRosetteBadge && (
@@ -616,8 +587,7 @@ export default function SearchResults({
                         )}
                       </div>
 
-                      {/* Location · Pronouns · Testimonials */}
-                      <div className="flex flex-wrap items-center gap-x-1.5 xs:gap-x-2 gap-y-0.5 text-zinc-500 font-sans text-[10px] xs:text-xs sm:text-[13px] md:text-[14px] font-medium mt-1 sm:mt-2">
+                      <div className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-zinc-500 font-sans text-[10px] sm:text-[13px] md:text-[14px] font-medium mt-1 sm:mt-1.5">
                         <span className="whitespace-nowrap">{doula.city}, {doula.state}</span>
                         <span className="text-zinc-300">|</span>
                         <span className="whitespace-nowrap">{doula.pronouns ?? 'she/her'}</span>
@@ -627,17 +597,16 @@ export default function SearchResults({
                             {doula.badgeText}
                           </span>
                         ) : (
-                          <button className="text-[#1B52B3] hover:underline text-left whitespace-nowrap font-medium">
+                          <button type="button" className="text-[#1B52B3] hover:underline text-left whitespace-nowrap font-medium">
                             {doula.testimonialsCount ?? doula.reviewCount} Testimonials
                           </button>
                         )}
                       </div>
                     </div>
 
-                    {/* Specialty tags — flex-wrap chip layout */}
-                    <div className="doula-tags mt-2.5 sm:mt-4 md:mt-5">
+                    <div className="doula-tags mt-2 sm:mt-3 md:mt-4">
                       {(() => {
-                        const allTags = doula.tags ?? [doula.type + ' Doula', 'Trauma-informed', 'LGBTQ+ clients'];
+                        const allTags = doula.tags ?? [doula.type + ' Doula'];
                         const visibleTags = allTags.slice(0, 5);
                         const extraCount = allTags.length - 5;
                         return (
@@ -645,16 +614,16 @@ export default function SearchResults({
                             {visibleTags.map((tag) => (
                               <span
                                 key={tag}
-                                className="doula-tag rounded-[6px] border-0 bg-[#E1DCD9] px-2 py-0.5 xs:px-2.5 xs:py-1 sm:px-3 sm:py-1.5 text-[9px] xs:text-[10px] sm:text-xs font-medium text-zinc-600"
+                                className="doula-tag rounded-[6px] border border-[#E8E0D8] bg-[#FAF6F0] px-2.5 py-1 text-xs sm:text-[13px] font-medium text-[#5C5450]"
                               >
                                 {tag}
                               </span>
                             ))}
                             {extraCount > 0 && (
                               <span
-                                className="doula-tag rounded-[6px] border-0 bg-[#E1DCD9] px-2 py-0.5 xs:px-2.5 xs:py-1 sm:px-3 sm:py-1.5 text-[9px] xs:text-[10px] sm:text-xs font-medium text-zinc-600"
+                                className="doula-tag rounded-[6px] border border-[#E8E0D8] bg-[#FAF6F0] px-2.5 py-1 text-xs sm:text-[13px] font-medium text-[#5C5450]"
                               >
-                                {extraCount} more...
+                                +{extraCount} more
                               </span>
                             )}
                           </>
@@ -662,63 +631,57 @@ export default function SearchResults({
                       })()}
                     </div>
 
-                    {/* View profile CTA */}
-                    <div className="mt-2.5 sm:mt-4 md:mt-5">
-                      <button className="flex items-center gap-1.5 text-xs sm:text-sm sm:text-[14px] font-bold text-[#1B52B3] hover:underline transition-colors">
+                    <div className="mt-2 sm:mt-3 md:mt-4">
+                      <button type="button" className="flex items-center gap-1.5 text-xs sm:text-sm font-bold text-[#1B52B3] hover:underline transition-colors">
                         <span>View profile</span>
                         <span className="text-sm sm:text-lg leading-none">→</span>
                       </button>
                     </div>
                   </div>
 
-                  {/* Right Column: Pricing & Policy Box */}
-                  <div className="flex-shrink-0 w-full sm:w-[170px] md:w-[185px] lg:w-[185px] xl:w-[210px] mt-2 sm:mt-0">
-                    <div className="border border-zinc-200 lg:border-0 rounded-2xl sm:rounded-[20px] lg:rounded-none bg-white lg:bg-transparent p-3 sm:p-4 md:p-4.5 lg:p-0 w-full flex flex-col">
-                      {/* Packages fee */}
-                      <div className="pb-2.5 sm:pb-3 border-b border-zinc-200/80">
-                        <span className="block font-sans text-[9px] xs:text-[10px] sm:text-xs font-bold text-[#00664B] mb-0.5">
+                  <div className="flex-shrink-0 w-full sm:w-[165px] md:w-[180px] lg:w-[185px] xl:w-[200px] mt-2 sm:mt-0">
+                    <div className="border border-zinc-200 lg:border-0 rounded-xl sm:rounded-2xl lg:rounded-none bg-white lg:bg-transparent p-3 sm:p-3.5 lg:p-0 w-full flex flex-col">
+                      <div className="pb-2 sm:pb-2.5 border-b border-zinc-200/80">
+                        <span className="block font-sans text-[9px] sm:text-xs font-bold text-[#00664B] mb-0.5">
                           Packages start at
                         </span>
-                        <span className="font-sans text-base xs:text-lg sm:text-xl lg:text-[20px] xl:text-[22px] font-bold text-zinc-900 leading-none">
-                          {doula.packagesStartAt === 1 ? '$1,00' : `$${(doula.packagesStartAt ?? 1000).toLocaleString('en-US')}`}
+                        <span className="font-sans text-base sm:text-xl lg:text-[20px] xl:text-[22px] font-bold text-zinc-900 leading-none">
+                          ${(doula.packagesStartAt ?? 0).toLocaleString('en-US', { minimumFractionDigits: doula.packagesStartAt === 1 ? 2 : 0 })}
                         </span>
                       </div>
 
-                      {/* Hourly Rate */}
-                      <div className="py-2.5 sm:py-3 border-b border-zinc-200/80">
-                        <span className="block font-sans text-[9px] xs:text-[10px] sm:text-xs font-bold text-[#00664B] mb-0.5">
+                      <div className="py-2 sm:py-2.5 border-b border-zinc-200/80">
+                        <span className="block font-sans text-[9px] sm:text-xs font-bold text-[#00664B] mb-0.5">
                           Add-on services start at
                         </span>
-                        <span className="font-sans text-xs xs:text-sm sm:text-base lg:text-[20px] xl:text-[22px] font-bold text-zinc-900 leading-none">
+                        <span className="font-sans text-sm sm:text-base lg:text-[20px] xl:text-[22px] font-bold text-zinc-900 leading-none">
                           ${doula.addOnServicesStartAt ?? 35}/hr
                         </span>
                       </div>
 
-                      {/* Sliding Scale Policy */}
-                      <div className={`py-2.5 sm:py-3 border-b border-zinc-200/80 flex items-center gap-1.5 sm:gap-2 text-[9px] xs:text-[10px] sm:text-xs font-medium ${doula.hasSlidingScale ? 'text-[#00664B]' : 'text-zinc-400'}`}>
+                      <div className={`py-2 sm:py-2.5 border-b border-zinc-200/80 flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-xs font-medium ${doula.hasSlidingScale ? 'text-[#00664B]' : 'text-zinc-400'}`}>
                         {doula.hasSlidingScale ? (
                           <>
-                            <span className="text-[#00664B] font-bold text-xs sm:text-sm leading-none w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 flex items-center justify-center flex-shrink-0">✓</span>
+                            <span className="text-[#00664B] font-bold text-xs sm:text-sm leading-none w-4 h-4 flex items-center justify-center flex-shrink-0">✓</span>
                             <span className="whitespace-nowrap text-zinc-700">Sliding scale</span>
                           </>
                         ) : (
                           <>
-                            <span className="text-zinc-400 font-semibold leading-none w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 flex items-center justify-center flex-shrink-0">✕</span>
+                            <span className="text-zinc-400 font-semibold leading-none w-4 h-4 flex items-center justify-center flex-shrink-0">✕</span>
                             <span className="whitespace-nowrap text-zinc-400">Sliding scale</span>
                           </>
                         )}
                       </div>
 
-                      {/* Payment Plans Policy */}
-                      <div className={`pt-2.5 sm:pt-3 flex items-center gap-1.5 sm:gap-2 text-[9px] xs:text-[10px] sm:text-xs font-medium ${doula.hasPaymentPlans ? 'text-[#00664B]' : 'text-zinc-400'}`}>
+                      <div className={`pt-2 sm:pt-2.5 flex items-center gap-1.5 sm:gap-2 text-[9px] sm:text-xs font-medium ${doula.hasPaymentPlans ? 'text-[#00664B]' : 'text-zinc-400'}`}>
                         {doula.hasPaymentPlans ? (
                           <>
-                            <span className="text-[#00664B] font-bold text-xs sm:text-sm leading-none w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 flex items-center justify-center flex-shrink-0">✓</span>
+                            <span className="text-[#00664B] font-bold text-xs sm:text-sm leading-none w-4 h-4 flex items-center justify-center flex-shrink-0">✓</span>
                             <span className="whitespace-nowrap text-zinc-700">Payment plans</span>
                           </>
                         ) : (
                           <>
-                            <span className="text-zinc-400 font-semibold leading-none w-3 h-3 xs:w-3.5 xs:h-3.5 sm:w-4 sm:h-4 flex items-center justify-center flex-shrink-0">✕</span>
+                            <span className="text-zinc-400 font-semibold leading-none w-4 h-4 flex items-center justify-center flex-shrink-0">✕</span>
                             <span className="whitespace-nowrap text-zinc-400">Payment plans</span>
                           </>
                         )}

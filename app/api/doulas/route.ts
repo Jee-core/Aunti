@@ -34,7 +34,6 @@ export async function GET(request: NextRequest) {
 
     let results: Doula[] = [...mockDoulas];
 
-    // Filter by zip prefix
     const cleanZip = zip?.trim() ?? '';
     if (cleanZip.length > 0) {
       results = results.filter((d) => d.zipCode.startsWith(cleanZip));
